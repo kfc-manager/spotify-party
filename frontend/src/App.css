@@ -1,0 +1,26 @@
+.button-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.app-button {
+    background: var(--primary-color);
+    color: var(--black-color);
+    padding: 1.5rem 3rem 1.5rem 3rem;
+    font-size: 300%;
+    border-radius: 3.5rem;
+    cursor: pointer;
+}
+
+/*============ MEDIA QUERIES ============*/
+
+@media only screen and (max-width: 1024px) {
+    .app-button {
+        font-size: 180%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+}
