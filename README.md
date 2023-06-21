@@ -16,7 +16,7 @@ an Access Token in order to be able to access you account.
 
 **Example:**
 
-![alt text](https://github.com/kfc-manager/spotify-party/blob/main/RegisterApp.png?raw=true)
+![alt text](https://github.com/kfc-manager/spotify-party/blob/main/register-app.png?raw=true)
 
 Next up clone this repository and create a ".env" file in [spotify-party/backend/](https://github.com/kfc-manager/spotify-party/tree/main/backend). You have
 to assign values to the vriables PORT, SPOTIFY_ID, SPOTIFY_SECRET and REDIRECT_URL inside the ".env" file. The PORT must be set to the Port you already used in the Redirect URI while registering the app. For SPOTIFY_ID put in the Client ID and for SPOTIFY_SECRET the Client secret. Both of them you can find under "SETTINGS"
