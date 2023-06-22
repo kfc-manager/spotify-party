@@ -44,10 +44,9 @@ If you want to use Docker and run the API through a Container use:
 make image
 ```
 
-to create a Docker Image. Before you can use the endpoints to control the queue, you have to hit the endpoint "/login".
-You will be redirected to Spotify's Authorization Website and have to login with your Spotify Account. After that it should say "Authorization successful". 
-The API now has an Access Token and you can use the other endpoints. The Token expires after 60 minutes and you have to request a new one with the method
-explained. This is due to the Spotify Authorization Flow (more to that below).
+Before you can use the endpoints to control the queue, you have to hit the endpoint "/login". You will be redirected to Spotify's Authorization Website
+and have to login with your Spotify Account. After that it should say "Authorization successful". The API now has an Access Token and you can use the other endpoints.
+The Token expires after 60 minutes and you have to request a new one with the method explained. This is due to the Spotify Authorization Flow (more to that below).
 If you also want to use my User Interface, navigate into [spotify-party/frontend/](https://github.com/kfc-manager/spotify-party/tree/main/frontend) and then use:
 
 ```
