@@ -32,13 +32,13 @@ SPOTIFY_SECRET=56a77c529c8c4ed6b019214ee7736ba9
 REDIRECT_URL=http://localhost:8080/callback
 ```
 
-Now you can compile and run the Go Code by using the command:
+Now you can compile and run the Go Code inside the working directory by using the command:
 
 ```
 make run
 ```
 
-inside the working directory. If you want to use Docker and run the API through a Container use:
+If you want to use Docker and run the API through a Container use:
 
 ```
 make image
