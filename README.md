@@ -8,6 +8,10 @@ Interface. The [React App](https://github.com/kfc-manager/spotify-party/tree/mai
 and the [dockerized API](https://github.com/kfc-manager/spotify-party/tree/main/backend) (backend) is hosted as Google Cloud Run Service [here](https://spotify-party-zty7jo4vkq-ey.a.run.app).
 It is also possible to host the app by yourself and hook up you own Spotify Account.
 
+## Note
+
+My GCP freetier ran out and this application is no longer deployed.
+
 ## Getting started
 
 Since my API is using the REST API provided by Spotify we have to follow their rules of authorization. To be able to share the access of your account you have
