@@ -1,5 +1,9 @@
+import useQueue from "./hooks/useQueue";
+
 const App = (): JSX.Element => {
-  return <>Hellow</>;
+  const { data, loading, error } = useQueue();
+
+  return <>{!loading && !error && data.map((song) => song.name)}</>;
 };
 
 export default App;
