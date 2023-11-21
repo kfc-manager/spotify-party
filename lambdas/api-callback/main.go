@@ -163,8 +163,12 @@ func handler(
 	}
 
 	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       "Success",
+		StatusCode: 301,
+		Body:       "Redirecting...",
+		Headers: map[string]string{
+			"Location": os.Getenv("BASE_URI"),
+		},
+		IsBase64Encoded: false,
 	}, nil
 }
 

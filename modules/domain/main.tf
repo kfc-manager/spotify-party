@@ -38,7 +38,12 @@ resource "aws_apigatewayv2_domain_name" "main" {
     security_policy = "TLS_1_2"
   }
 
-  depends_on = [aws_acm_certificate.main]
+  depends_on = [
+    aws_acm_certificate.main,
+    aws_acm_certificate_validation.main,
+    data.aws_route53_zone.public,
+    aws_route53_record.validation
+  ]
 }
 
 resource "aws_route53_record" "api" {

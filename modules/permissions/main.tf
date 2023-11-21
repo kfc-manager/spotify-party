@@ -35,23 +35,6 @@ data "aws_iam_policy_document" "write_token_secret" {
   }
 }
 
-data "aws_iam_policy_document" "vpc_assignment" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "ec2:DescribeInstances",
-      "ec2:CreateNetworkInterface",
-      "ec2:AttachNetworkInterface",
-      "ec2:DescribeNetworkInterfaces",
-      "autoscaling:CompleteLifecycleAction",
-      "ec2:DeleteNetworkInterface"
-    ]
-
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_role" "read_static_secrets" {
   name               = "${var.project_tag}-lambda-read-static-secrets"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -59,11 +42,6 @@ resource "aws_iam_role" "read_static_secrets" {
   inline_policy {
     name   = "${var.project_tag}-read-static-secrets"
     policy = data.aws_iam_policy_document.read_static_secrets.json
-  }
-
-  inline_policy {
-    name   = "${var.project_tag}-vpc_assignment"
-    policy = data.aws_iam_policy_document.vpc_assignment.json
   }
 
   tags = {

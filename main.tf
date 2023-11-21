@@ -9,7 +9,8 @@ locals {
   region         = data.aws_region.current.name
   account_id     = data.aws_caller_identity.current.account_id
   callback_route = "/callback"
-  redirect_uri   = "https://${local.domain_name}${local.callback_route}"
+  base_uri       = "https://${local.domain_name}"
+  redirect_uri   = "${local.base_uri}${local.callback_route}"
 }
 
 module "domain" {
@@ -25,10 +26,8 @@ module "secrets" {
   env         = local.env
   project_tag = local.project_tag
   static_secrets = {
-    client_id        = var.client_id
-    client_secret    = var.client_secret
-    spotify_username = var.spotify_username
-    spotify_password = var.spotify_password
+    client_id     = var.client_id
+    client_secret = var.client_secret
   }
 }
 
@@ -58,6 +57,25 @@ module "callback_lambda" {
     STATIC_SECRETS_ID = module.secrets.static_arn
     TOKEN_SECRET_ID   = module.secrets.access_token_arn
     REDIRECT_URI      = local.redirect_uri
+    BASE_URI          = local.base_uri
+  }
+}
+
+module "login_lambda" {
+  source = "./modules/function"
+
+  project        = local.project
+  env            = local.env
+  region         = local.region
+  account_id     = local.account_id
+  name           = "${local.project_tag}-api-login"
+  description    = "Login to Spotify as part of the authorization flow of the Spotify API"
+  iam_role_arn   = module.permissions.read_static_secrets_role_arn
+  ecr_image_name = "${local.project_tag}-api-login:latest"
+  env_variables = {
+    REGION            = local.region
+    STATIC_SECRETS_ID = module.secrets.static_arn
+    REDIRECT_URI      = local.redirect_uri
   }
 }
 
@@ -78,35 +96,37 @@ module "get_queue_lambda" {
   }
 }
 
-module "network" {
-  source = "./modules/network"
-
-  project_tag       = local.project_tag
-  project           = local.project
-  env               = local.env
-  availability_zone = "${local.region}a"
-}
-
-module "token_caller_lambda" {
+module "update_queue_lambda" {
   source = "./modules/function"
 
   project        = local.project
   env            = local.env
   region         = local.region
   account_id     = local.account_id
-  name           = "${local.project_tag}-token-caller"
-  description    = "Lambda Function that calls Spotify API to start authorization flow"
-  iam_role_arn   = module.permissions.read_static_secrets_role_arn
-  ecr_image_name = "${local.project_tag}-token-caller:latest"
-  memory_size    = 2048
-  timeout        = 30
+  name           = "${local.project_tag}-update-queue"
+  description    = "Lambda Function to add song to Spotify queue with the Spotify API"
+  iam_role_arn   = module.permissions.read_token_secret_role_arn
+  ecr_image_name = "${local.project_tag}-update-queue:latest"
   env_variables = {
-    REDIRECT_URI      = local.redirect_uri
-    STATIC_SECRETS_ID = module.secrets.static_arn
+    REGION          = local.region
+    TOKEN_SECRET_ID = module.secrets.access_token_arn
   }
-  vpc_config = {
-    subnet_ids         = [module.network.private_subnet_id]
-    security_group_ids = [module.network.security_group_id]
+}
+
+module "search_track_lambda" {
+  source = "./modules/function"
+
+  project        = local.project
+  env            = local.env
+  region         = local.region
+  account_id     = local.account_id
+  name           = "${local.project_tag}-search-track"
+  description    = "Lambda Function to query for a Spotify song in the Spotify API"
+  iam_role_arn   = module.permissions.read_token_secret_role_arn
+  ecr_image_name = "${local.project_tag}-search-track:latest"
+  env_variables = {
+    REGION          = local.region
+    TOKEN_SECRET_ID = module.secrets.access_token_arn
   }
 }
 
@@ -121,10 +141,36 @@ module "api" {
   api_domain_name_id         = module.domain.api_domain_name_id
   callback_lambda_invoke_arn = module.callback_lambda.invoke_arn
   callback_lambda_arn        = module.callback_lambda.arn
-  lambda_routes = [{
-    lambda_invoke_arn = module.callback_lambda.invoke_arn
-    lambda_arn        = module.callback_lambda.arn
-    method            = "GET"
-    route             = local.callback_route
-  }]
+  lambda_routes = [
+    {
+      lambda_invoke_arn = module.callback_lambda.invoke_arn
+      lambda_arn        = module.callback_lambda.arn
+      method            = "GET"
+      route             = local.callback_route
+    },
+    {
+      lambda_invoke_arn = module.login_lambda.invoke_arn
+      lambda_arn        = module.login_lambda.arn
+      method            = "GET"
+      route             = "/login"
+    },
+    {
+      lambda_invoke_arn = module.get_queue_lambda.invoke_arn
+      lambda_arn        = module.get_queue_lambda.arn
+      method            = "GET"
+      route             = "/queue"
+    },
+    {
+      lambda_invoke_arn = module.update_queue_lambda.invoke_arn
+      lambda_arn        = module.update_queue_lambda.arn
+      method            = "POST"
+      route             = "/song"
+    },
+    {
+      lambda_invoke_arn = module.search_track_lambda.invoke_arn
+      lambda_arn        = module.search_track_lambda.arn
+      method            = "GET"
+      route             = "/search"
+    },
+  ]
 }

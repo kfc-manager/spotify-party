@@ -16,8 +16,11 @@ import (
 )
 
 type SpotifyAPIResponse struct {
-	CurrentlyPlaying SpotifyAPISong   `json:"currently_playing"`
-	Queue            []SpotifyAPISong `json:"queue"`
+	SearchResult SpotifyAPISearchResult `json:"tracks"`
+}
+
+type SpotifyAPISearchResult struct {
+	Items []SpotifyAPISong `json:"items"`
 }
 
 type SpotifyAPISong struct {
@@ -41,7 +44,7 @@ type SpotifyAPIImages struct {
 }
 
 type Response struct {
-	Queue []Song `json:"queue"`
+	Tracks []Song `json:"tracks"`
 }
 
 type Song struct {
@@ -66,26 +69,32 @@ func getTokenSecret(serviceClient *secretsmanager.SecretsManager) (*string, erro
 	return token, nil
 }
 
-func buildRequest(token string) (*http.Request, error) {
+func buildRequest(token string, query string) (*http.Request, error) {
 
-	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/me/player/queue", nil)
+	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/search", nil)
 	if err != nil {
 		return nil, err
 	}
+
+	params := req.URL.Query()
+	params.Add("q", query)
+	params.Add("type", "track")
+	req.URL.RawQuery = params.Encode()
+
+	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer "+token)
 
 	return req, nil
 }
 
-func transformQueue(spotifyRes SpotifyAPIResponse) []Song {
+func transformSearchResult(spotifyRes SpotifyAPIResponse) []Song {
 
-	queue := []Song{}
-	queue = append(queue, *transformSong(spotifyRes.CurrentlyPlaying))
-	for _, elem := range spotifyRes.Queue {
-		queue = append(queue, *transformSong(elem))
+	result := []Song{}
+	for _, elem := range spotifyRes.SearchResult.Items {
+		result = append(result, *transformSong(elem))
 	}
 
-	return queue
+	return result
 }
 
 func transformSong(spotifySong SpotifyAPISong) *Song {
@@ -107,6 +116,14 @@ func transformSong(spotifySong SpotifyAPISong) *Song {
 func handler(
 	event events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
+
+	// check if query is provided
+	if event.QueryStringParameters["query"] == "" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "Missing Parameter",
+		}, nil
+	}
 
 	// create AWS SecretsManager session
 	awsSession, err := session.NewSession(&aws.Config{
@@ -130,7 +147,7 @@ func handler(
 	}
 
 	// build request for the Spotify API
-	req, err := buildRequest(*token)
+	req, err := buildRequest(*token, event.QueryStringParameters["query"])
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -186,8 +203,8 @@ func handler(
 	}
 
 	// build response
-	queueRes := &Response{Queue: transformQueue(*body)}
-	resBytes, err := json.Marshal(queueRes)
+	tracksRes := &Response{Tracks: transformSearchResult(*body)}
+	resBytes, err := json.Marshal(tracksRes)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,

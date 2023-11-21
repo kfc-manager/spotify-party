@@ -38,6 +38,36 @@ resource "aws_apigatewayv2_stage" "main" {
   api_id      = aws_apigatewayv2_api.main.id
   name        = "$default"
   auto_deploy = true
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.main[0].route_key
+    throttling_burst_limit = 30
+    throttling_rate_limit  = 0.01
+  }
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.main[1].route_key
+    throttling_burst_limit = 30
+    throttling_rate_limit  = 0.01
+  }
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.main[2].route_key
+    throttling_burst_limit = 200
+    throttling_rate_limit  = 0.01
+  }
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.main[3].route_key
+    throttling_burst_limit = 80
+    throttling_rate_limit  = 0.01
+  }
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.main[4].route_key
+    throttling_burst_limit = 200
+    throttling_rate_limit  = 0.01
+  }
 }
 
 resource "aws_apigatewayv2_api_mapping" "main" {
