@@ -156,6 +156,7 @@ module "api" {
   api_domain_name_id         = module.domain.api_domain_name_id
   callback_lambda_invoke_arn = module.callback_lambda.invoke_arn
   callback_lambda_arn        = module.callback_lambda.arn
+  base_uri                   = local.base_uri
   lambda_routes = [
     {
       lambda_invoke_arn = module.callback_lambda.invoke_arn
