@@ -5,7 +5,7 @@ resource "aws_apigatewayv2_api" "main" {
 
   cors_configuration {
     allow_methods = ["GET", "POST"]
-    allow_origins = ["https://kiliansqueue.com"]
+    allow_origins = [var.base_uri]
     allow_headers = ["Content-Type", "Authorization"]
   }
 
@@ -49,9 +49,9 @@ resource "aws_apigatewayv2_stage" "main" {
     for_each = var.lambda_routes
 
     content {
-    route_key              = "${route_settings.value["method"]} ${route_settings.value["route"]}"
-    throttling_burst_limit = 1000
-    throttling_rate_limit  = 0.01
+      route_key              = "${route_settings.value["method"]} ${route_settings.value["route"]}"
+      throttling_burst_limit = 1000
+      throttling_rate_limit  = 0.01
     }
   }
 }

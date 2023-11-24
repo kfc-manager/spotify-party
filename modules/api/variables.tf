@@ -23,6 +23,11 @@ variable "account_id" {
   type        = string
 }
 
+variable "base_uri" {
+  description = "Base URI or domain of the application for allowing CORS"
+  type        = string
+}
+
 variable "api_domain_name_id" {
   description = "ID of the by domain created API domain name"
   type        = string
