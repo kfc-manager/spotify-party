@@ -1,12 +1,12 @@
-type Song = {
+type APISong = {
   id: string;
   name: string;
   image_url: string;
-  artists: string[];
+  artists: string[] | null;
   duration_ms: number;
-}
+};
 
-export type { Song }
+export type { APISong };
 
 enum APIErrorType {
   UNAUTHORIZED = "UNAUTHORIZED",
@@ -25,7 +25,7 @@ class APIError extends Error {
   }
 
   get name() {
-    return `APIError[${this.type}]`
+    return `APIError[${this.type}]`;
   }
 }
 

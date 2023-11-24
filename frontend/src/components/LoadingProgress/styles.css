@@ -1,0 +1,49 @@
+.loading-progress {
+  position: relative;
+  z-index: 401;
+  display: inline-block;
+  width: 4rem;
+  height: 4rem;
+  animation: 1.4s linear 0s infinite normal none running
+    loading-progress-animation;
+}
+
+.loading-progress-svg {
+  display: block;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--green);
+}
+
+.loading-progress-svg-circle {
+  stroke: currentcolor;
+  stroke-dasharray: 80px, 200px;
+  stroke-dashoffset: 0px;
+  animation: 1.4s ease-in-out 0s infinite normal none running
+    loading-progress-circle-animation;
+}
+
+@keyframes loading-progress-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-progress-circle-animation {
+  0% {
+    stroke-dasharray: 1px, 200px;
+    stroke-dashoffset: 0px;
+  }
+  50% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -15px;
+  }
+  100% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -125px;
+  }
+}

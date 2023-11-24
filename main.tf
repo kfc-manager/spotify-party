@@ -2,21 +2,36 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  project        = "Spotify Party"
-  project_tag    = "spotify-party"
-  env            = "Production"
-  domain_name    = "kiliansqueue.com"
-  region         = data.aws_region.current.name
-  account_id     = data.aws_caller_identity.current.account_id
-  callback_route = "/callback"
-  base_uri       = "https://${local.domain_name}"
-  redirect_uri   = "${local.base_uri}${local.callback_route}"
+  project          = "Spotify Party"
+  project_tag      = "spotify-party"
+  env              = "Production"
+  domain_name      = "kiliansqueue.com"
+  api_domain_name  = "api.kiliansqueue.com"
+  region           = data.aws_region.current.name
+  account_id       = data.aws_caller_identity.current.account_id
+  account_arn      = data.aws_caller_identity.current.arn
+  callback_route   = "/callback"
+  base_uri         = "https://${local.domain_name}"
+  api_redirect_uri = "https://${local.api_domain_name}${local.callback_route}"
 }
 
 module "domain" {
   source = "./modules/domain"
 
-  domain_name = local.domain_name
+  domain_name     = local.domain_name
+  api_domain_name = local.api_domain_name
+}
+
+module "interface" {
+  source = "./modules/interface"
+
+  project             = local.project
+  env                 = local.env
+  project_tag         = local.project_tag
+  domain_name         = local.domain_name
+  public_host_zone_id = module.domain.public_host_zone_id
+  acm_certificate_arn = module.domain.acm_certificate_arn
+  account_arn         = local.account_arn
 }
 
 module "secrets" {
@@ -56,7 +71,7 @@ module "callback_lambda" {
     REGION            = local.region
     STATIC_SECRETS_ID = module.secrets.static_arn
     TOKEN_SECRET_ID   = module.secrets.access_token_arn
-    REDIRECT_URI      = local.redirect_uri
+    REDIRECT_URI      = local.api_redirect_uri
     BASE_URI          = local.base_uri
   }
 }
@@ -75,7 +90,7 @@ module "login_lambda" {
   env_variables = {
     REGION            = local.region
     STATIC_SECRETS_ID = module.secrets.static_arn
-    REDIRECT_URI      = local.redirect_uri
+    REDIRECT_URI      = local.api_redirect_uri
   }
 }
 
@@ -174,3 +189,5 @@ module "api" {
     },
   ]
 }
+
+

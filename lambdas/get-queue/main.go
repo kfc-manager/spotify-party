@@ -16,7 +16,7 @@ import (
 )
 
 type SpotifyAPIResponse struct {
-	CurrentlyPlaying SpotifyAPISong   `json:"currently_playing"`
+	CurrentlyPlaying *SpotifyAPISong  `json:"currently_playing"`
 	Queue            []SpotifyAPISong `json:"queue"`
 }
 
@@ -80,7 +80,10 @@ func buildRequest(token string) (*http.Request, error) {
 func transformQueue(spotifyRes SpotifyAPIResponse) []Song {
 
 	queue := []Song{}
-	queue = append(queue, *transformSong(spotifyRes.CurrentlyPlaying))
+	if spotifyRes.CurrentlyPlaying == nil {
+		return queue
+	}
+	queue = append(queue, *transformSong(*spotifyRes.CurrentlyPlaying))
 	for _, elem := range spotifyRes.Queue {
 		queue = append(queue, *transformSong(elem))
 	}
@@ -198,6 +201,9 @@ func handler(
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(resBytes),
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
 	}, nil
 }
 

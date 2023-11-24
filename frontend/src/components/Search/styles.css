@@ -1,0 +1,21 @@
+.search {
+  position: relative;
+  height: calc(100vh - 80px);
+  width: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.search-song-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  gap: 4px;
+  margin: 40px 0;
+}
+
+@media (max-width: 500px) {
+  .search-song-list {
+    margin: 20px 0;
+  }
+}

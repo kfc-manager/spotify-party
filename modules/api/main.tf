@@ -3,6 +3,12 @@ resource "aws_apigatewayv2_api" "main" {
   description   = "${var.project} API"
   protocol_type = "HTTP"
 
+  cors_configuration {
+    allow_methods = ["GET", "POST"]
+    allow_origins = ["https://kiliansqueue.com"]
+    allow_headers = ["Content-Type", "Authorization"]
+  }
+
   tags = {
     Project     = var.project
     Environment = var.env
@@ -39,34 +45,14 @@ resource "aws_apigatewayv2_stage" "main" {
   name        = "$default"
   auto_deploy = true
 
-  route_settings {
-    route_key              = aws_apigatewayv2_route.main[0].route_key
-    throttling_burst_limit = 30
-    throttling_rate_limit  = 0.01
-  }
+  dynamic "route_settings" {
+    for_each = var.lambda_routes
 
-  route_settings {
-    route_key              = aws_apigatewayv2_route.main[1].route_key
-    throttling_burst_limit = 30
+    content {
+    route_key              = "${route_settings.value["method"]} ${route_settings.value["route"]}"
+    throttling_burst_limit = 1000
     throttling_rate_limit  = 0.01
-  }
-
-  route_settings {
-    route_key              = aws_apigatewayv2_route.main[2].route_key
-    throttling_burst_limit = 200
-    throttling_rate_limit  = 0.01
-  }
-
-  route_settings {
-    route_key              = aws_apigatewayv2_route.main[3].route_key
-    throttling_burst_limit = 80
-    throttling_rate_limit  = 0.01
-  }
-
-  route_settings {
-    route_key              = aws_apigatewayv2_route.main[4].route_key
-    throttling_burst_limit = 200
-    throttling_rate_limit  = 0.01
+    }
   }
 }
 
