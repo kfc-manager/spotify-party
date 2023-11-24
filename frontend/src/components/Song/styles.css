@@ -1,0 +1,64 @@
+.song {
+  display: flex;
+  border: 1px solid var(--light-grey);
+  gap: 12px;
+  padding: 0 16px 0 0;
+  margin: 0 10px;
+}
+
+.song-text-info {
+  margin-top: 10px;
+  width: 300px;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.song-name {
+  font-size: 16px;
+}
+
+.song-artists {
+  color: var(--light-grey);
+  font-size: 12px;
+}
+
+.song-end-container {
+  display: flex;
+  align-items: center;
+}
+
+.song-duration {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  color: var(--light-grey);
+}
+
+.song-add-button {
+  background-color: var(--dark-grey);
+  color: var(--light-grey);
+  transition: 400ms all ease;
+  height: 40px;
+  width: 40px;
+  border-radius: 4px;
+}
+
+.song-add-button:hover {
+  background-color: var(--green-transparent);
+  color: var(--white);
+  border: 1px solid var(--light-grey);
+}
+
+@media (max-width: 500px) {
+  .song-name {
+    font-size: 14px;
+  }
+
+  .song-artists {
+    font-size: 10px;
+  }
+
+  .song-duration {
+    font-size: 12px;
+  }
+}

@@ -1,28 +1,21 @@
-import "./App.css"
-import { useState } from "react"
-import Queue from "./components/queue/queue"
-import Search from "./components/search/search"
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Queue from "./components/Queue/Queue";
+import Search from "./components/Search/Search";
+import Navbar from "./components/Navbar/Navbar";
+import { useState } from "react";
 
 const App = (): JSX.Element => {
+  const [query, setQuery] = useState<string>("");
 
-    const [mode, setMode] = useState<boolean>(true)
+  return (
+    <BrowserRouter>
+      <Navbar query={query} setQuery={setQuery} />
+      <Routes>
+        <Route path="/" element={<Queue />} />
+        <Route path="/search" element={<Search query={query} />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
-    const renderComponent = (): JSX.Element => {
-        if (mode) {
-            return <Queue/>
-        }
-        return <Search/>
-    }
-
-    return (
-        <div className="app">
-            <div className="button-container">
-                <button className="app-button" onClick={(): void => {setMode(true)}}>Queue</button>
-                <button className="app-button" onClick={(): void => {setMode(false)}}>Search</button>
-            </div>
-            {renderComponent()}
-        </div>
-    )
-}
-
-export default App
+export default App;
