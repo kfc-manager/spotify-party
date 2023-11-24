@@ -4,6 +4,32 @@ Spotify Party is a web application to control the queue of my personal Spotify a
 
 ## How it works :thinking:
 
+![alt text](https://github.com/kfc-manager/spotify-party/blob/main/assets/architecture_transparent.png?raw=true)
+
+### &rarr; Frontend :desktop_computer:
+
+- Domain is registered with `Route53` and points to `CloudFront`
+- `CloudFront` fetches and caches the static files in order for the `React App` to work
+- `React App` makes requests to the `API Gateway` to view and make changes to the Spotify queue
+
+### &rarr; Backend :gear:
+
+- `API Gateway` suppplies endpoints to invoke the `Lambda functions`
+- `get-queue`, `search-tracks` and `update-queue` use the access token stored in the `SecretsManager` to access the Spotify API
+- `api-login` and `api-callback` use the `client_id` and `client_secret` to fetch a token from the Spotify API
+
+![alt text](https://github.com/kfc-manager/spotify-party/blob/main/assets/spotify_auth_code_flow.png?raw=true)
+
+### &rarr; `api-login`
+
+- When request of the `React App` returns an `UNAUTHORIZED` error user gets redirected to this endpoint
+- Builds request with URL encoded parameters and redirects to the Spotify login
+
+### &rarr; `api-callback`
+
+- After successful Spotify login the user gets redirected to this endpoint
+- Forms request with `code` provided from Spotify for an access token
+- Saves fresh token from response in the `SecreatsManager` and redirects user back to the base domain
 
 ## Deployment :mechanic:
 
