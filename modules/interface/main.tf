@@ -153,6 +153,13 @@ resource "aws_s3_bucket_policy" "s3_put" {
   policy = data.aws_iam_policy_document.s3_put.json
 }
 
+# gets triggered on each apply
+resource "null_resource" "always_run" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
 resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.main.id
   key          = "index.html"
@@ -160,6 +167,13 @@ resource "aws_s3_object" "index" {
   content_type = "text/html"
   acl          = "public-read"
   etag         = filemd5("${abspath(path.root)}/frontend/dist/index.html")
+
+  # always recreates the function so it pulls the latest image
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
 }
 
 resource "aws_s3_object" "css" {
@@ -171,6 +185,13 @@ resource "aws_s3_object" "css" {
   content_type = "text/css"
   acl          = "public-read"
   etag         = filemd5("${abspath(path.root)}/frontend/dist/${each.value}")
+
+  # always recreates the function so it pulls the latest image
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
 }
 
 resource "aws_s3_object" "js" {
@@ -182,4 +203,11 @@ resource "aws_s3_object" "js" {
   content_type = "application/javascript"
   acl          = "public-read"
   etag         = filemd5("${abspath(path.root)}/frontend/dist/${each.value}")
+
+  # always recreates the function so it pulls the latest image
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
 }

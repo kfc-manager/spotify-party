@@ -1,20 +1,16 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Queue from "./components/Queue/Queue";
 import Search from "./components/Search/Search";
 import Navbar from "./components/Navbar/Navbar";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 const App = (): JSX.Element => {
   const [query, setQuery] = useState<string>("");
 
   return (
-    <BrowserRouter>
+    <Fragment>
       <Navbar query={query} setQuery={setQuery} />
-      <Routes>
-        <Route path="/" element={<Queue />} />
-        <Route path="/search" element={<Search query={query} />} />
-      </Routes>
-    </BrowserRouter>
+      {query.length < 1 ? <Queue /> : <Search query={query} />}
+    </Fragment>
   );
 };
 

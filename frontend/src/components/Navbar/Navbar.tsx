@@ -1,11 +1,8 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./styles.css";
 import { ChangeEvent, useEffect, useState } from "react";
 import { NavbarProps } from "./types";
 
 const Navbar = ({ query, setQuery }: NavbarProps): JSX.Element => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [home, setHome] = useState<boolean>(true);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -13,26 +10,23 @@ const Navbar = ({ query, setQuery }: NavbarProps): JSX.Element => {
   };
 
   useEffect((): void => {
-    location.pathname === "/" && query.length > 0 && setQuery("");
-    location.pathname === "/" && setHome(true);
-    location.pathname !== "/" && setHome(false);
-  }, [location]);
-
-  useEffect((): void => {
-    if (query.length < 1) {
-      navigate("/");
-    } else {
-      navigate("/search");
-    }
+    query.length > 0 && setHome(false);
+    query.length < 1 && setHome(true);
   }, [query]);
 
   return (
     <div className="navbar">
       <div className="navbar-controls">
         <div className={`navbar-link${home ? " navbar-link-selected" : ""}`}>
-          <Link
-            style={{ display: "flex", alignItems: "center", color: "inherit" }}
-            to="/"
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "inherit",
+              backgroundColor: "transparent",
+              fontSize: "32px",
+            }}
+            onClick={() => setQuery("")}
           >
             <svg
               stroke="currentColor"
@@ -50,7 +44,7 @@ const Navbar = ({ query, setQuery }: NavbarProps): JSX.Element => {
                 d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5"
               ></path>
             </svg>
-          </Link>
+          </button>
         </div>
         <input
           type="text"
